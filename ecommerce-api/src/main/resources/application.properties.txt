@@ -1,0 +1,19 @@
+spring.datasource.url=jdbc:h2:file:/data/demo
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=password
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.defer-datasource-initialization=true
+spring.sql.init.mode=always
+spring.h2.console.enabled=true
+spring.jpa.show-sql=true
+
+spring.servlet.multipart.enabled=true
+spring.servlet.multipart.maxFileSize=70MB
+spring.servlet.multipart.maxRequestSize=70MB
+
+log4j.logger.org.hibernate.type=trace 
+log4j.appender.consoleAppender=org.apache.log4j.ConsoleAppender
+log4j.appender.consoleAppender.layout=org.apache.log4j.PatternLayout
+#log4j.appender.consoleAppender.layout.ConversionPattern=[%t] %-5p %c %x - %m%n
+logging.level.=DEBUG

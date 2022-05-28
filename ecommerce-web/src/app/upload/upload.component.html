@@ -1,0 +1,26 @@
+<div class="mat-elevation-z8">
+    <div class="err-msg">{{message}}</div>
+  <mat-progress-bar mode="indeterminate" *ngIf="isProgress"></mat-progress-bar>
+    
+  <mat-form-field>
+    <div>
+      <mat-toolbar>
+        <!-- Display files names [(ngModel)]="fileAttr" -->
+        <input matInput readonly name="name" [(ngModel)]="fileAttr"/>
+        <!-- Browse Button -->
+        <button mat-flat-button color="primary" [disabled]="isProgress">Browse File</button>
+      </mat-toolbar>
+      <!-- Fetch selected filed on change -->
+      <input
+        type="file"
+        #fileInput
+        id="uploadFile"
+        (change)="uploadFile($event)"
+        name="uploadFile"
+        accept="csv/*"
+      />
+     
+    </div>
+        
+  </mat-form-field>
+</div>

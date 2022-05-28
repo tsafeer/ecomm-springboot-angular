@@ -1,0 +1,36 @@
+table {
+  width: 100%;
+}
+
+.mat-table {
+  overflow: auto;
+  max-height: 700px;
+}
+
+.mat-header-cell {
+  background-color: #e0e0e0;
+  border-left: 1px solid #e0e0e0 !important;
+  text-align: center;
+  color: black;
+}
+
+.mat-cell{
+  border-left: 1px solid #e0e0e0 !important;
+  padding: 0px 4px !important;
+}
+
+.mat-pagination-wrapper {
+  width: auto !important;
+}
+
+.mat-row:nth-child(even) {
+  background-color: #edf1f5;
+}
+
+.mat-row:nth-child(odd) {
+  background-color: #9fb5cb;
+}
+
+.col-currency {
+  text-align: right;
+}

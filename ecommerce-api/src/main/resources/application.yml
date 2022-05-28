@@ -1,0 +1,26 @@
+spring: 
+  datasource: 
+    url: jdbc:h2:file:/data/demo
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  jpa: 
+    database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+  sql.init.mode: always
+  h2.console.enabled: true
+  jpa.show-sql: true
+  servlet: 
+    multipart: 
+      enabled: true
+      maxFileSize: 70MB
+      maxRequestSize: 70MB
+server:
+  servlet:
+    context-path: /ecommsapi
+    
+log4j: 
+  logger.org.hibernate.type: trace 
+  appender: 
+    consoleAppender: org.apache.log4j.ConsoleAppender
+    consoleAppender.layout: org.apache.log4j.PatternLayout
