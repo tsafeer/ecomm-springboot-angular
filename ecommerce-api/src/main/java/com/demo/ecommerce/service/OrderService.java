@@ -3,12 +3,11 @@
  */
 package com.demo.ecommerce.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -44,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class OrderService {
-
+	
 	@Autowired
 	private OrderRepository orderRepository; 
 	
@@ -60,14 +59,20 @@ public class OrderService {
 	@Autowired
 	private SalesChannelRepository salesChannelRepository; 
 	
-	public List<Order> getAllOrders(){
-		Pageable firstPageWithTwoElements = PageRequest.of(0,0);
-		return orderRepository.findAll(firstPageWithTwoElements).toList();
-	}
+	/**
+	 * public List<Order> getAllOrders(){ Pageable firstPageWithTwoElements =
+	 * PageRequest.of(0,0); return
+	 * orderRepository.findAll(firstPageWithTwoElements).toList(); }
+	 */
 
+	/**
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
 	@Transactional
 	public ResponseVm uploadCsv(MultipartFile file) throws Exception {
-
+		log.debug("Start processing the file");
 		String message = "";
 		int status = 0; 
 		List<Errors> errorList = null;
@@ -75,15 +80,18 @@ public class OrderService {
 		CsvOrderProcesserVm masterData = getMasterData();
 		//Porcess the file
 		List<Order> orders = CsvOrderProcesser.parseCsv(file.getInputStream(), masterData, errors);
-
+		
 		//Check and persist
 		if(!errors.isEmpty()) {
 			log.error("validation failed : {}", errors );
 			status = 1;
 
 			message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-			errorList = errors.entrySet().stream().map(i -> i.getValue()).collect(Collectors.toList());
-		}else {
+			errorList = errors.entrySet().stream().map(Entry<String, Errors>::getValue).collect(Collectors.toList());
+		} else if (orders == null || orders.isEmpty()){
+			status = 1;
+			message = "File is empty!. Please upload a valid file";
+		} else {
 			message = "Uploaded the file successfully: " + file.getOriginalFilename();
 			regionRepository.saveAll(masterData.regionMap.values().stream().collect(Collectors.toList()));
 			countryRepository.saveAll(masterData.countryMap.values().stream().collect(Collectors.toList()));
@@ -93,42 +101,21 @@ public class OrderService {
 			ofSize.parallelStream().forEach(i -> orderRepository.saveAll(i));
 
 		} 
-		ResponseVm response = new ResponseVm(status, message, errorList);
-		return response;
+		return new ResponseVm(status, message, errorList);
 	}
 
+	/**
+	 * @return
+	 */
 	private CsvOrderProcesserVm getMasterData() {
-		Map<String,Country> countryMap;
-		List<Country> allCountry = countryRepository.findAll();
-		if(allCountry != null && !allCountry.isEmpty()) {
-			countryMap = allCountry.stream().collect(Collectors.toMap(i -> i.getCountryName(), i -> i));
-		}else {
-			countryMap = new HashMap<>();
-		}
+		Map<String,Country> countryMap = populateCountryMap();
 		
-		Map<String,Region> regionMap;
-		List<Region> allRegion = regionRepository.findAll();
-		if(allRegion != null && !allRegion.isEmpty()) {
-			regionMap = allRegion.stream().collect(Collectors.toMap(i -> i.getRegionName(), i -> i));
-		}else {
-			regionMap = new HashMap<>();
-		}
+		Map<String,Region> regionMap = populateRegionMap();
 		
-		Map<String,ItemType> itemTypeMap;
-		List<ItemType> allItemType = itemTypeRepository.findAll();
-		if(allItemType != null && !allItemType.isEmpty()) {
-			itemTypeMap = allItemType.stream().collect(Collectors.toMap(i -> i.getItemTypeName(), i -> i));
-		}else {
-			itemTypeMap = new HashMap<>();
-		}
+		Map<String,ItemType> itemTypeMap = populateItemTypeMap();
 		
-		Map<String,SalesChannel> salesChannelMap;
-		List<SalesChannel> allSalesChannel = salesChannelRepository.findAll();
-		if(allSalesChannel != null && !allSalesChannel.isEmpty()) {
-			salesChannelMap = allSalesChannel.stream().collect(Collectors.toMap(i -> i.getSalesChannelName(), i -> i));
-		}else {
-			salesChannelMap = new HashMap<>();
-		}
+		Map<String,SalesChannel> salesChannelMap = populateSalesChannelMap();
+		
 		CsvOrderProcesserVm vm = new CsvOrderProcesserVm();
 		vm.setCountryMap(countryMap)
 			.setItemTypeMap(itemTypeMap)
@@ -136,11 +123,69 @@ public class OrderService {
 			.setSalesChannelMap(salesChannelMap);
 		
 		return vm;
-		
-		
+	}
+
+	/**
+	 * @return
+	 */
+	private Map<String, SalesChannel> populateSalesChannelMap() {
+		Map<String, SalesChannel> salesChannelMap;
+		List<SalesChannel> allSalesChannel = salesChannelRepository.findAll();
+		if(!allSalesChannel.isEmpty()) {
+			salesChannelMap = allSalesChannel.stream().collect(Collectors.toMap(SalesChannel::getSalesChannelName, i -> i));
+		}else {
+			salesChannelMap = new HashMap<>();
+		}
+		return salesChannelMap;
+	}
+
+	/**
+	 * @return
+	 */
+	private Map<String, ItemType> populateItemTypeMap() {
+		Map<String, ItemType> itemTypeMap;
+		List<ItemType> allItemType = itemTypeRepository.findAll();
+		if(!allItemType.isEmpty()) {
+			itemTypeMap = allItemType.stream().collect(Collectors.toMap(ItemType::getItemTypeName, i -> i));
+		}else {
+			itemTypeMap = new HashMap<>();
+		}
+		return itemTypeMap;
+	}
+
+	/**
+	 * @return
+	 */
+	private Map<String, Region> populateRegionMap() {
+		Map<String, Region> regionMap;
+		List<Region> allRegion = regionRepository.findAll();
+		if(!allRegion.isEmpty()) {
+			regionMap = allRegion.stream().collect(Collectors.toMap(Region::getRegionName, i -> i));
+		}else {
+			regionMap = new HashMap<>();
+		}
+		return regionMap;
+	}
+
+	/**
+	 * @return
+	 */
+	private Map<String, Country> populateCountryMap() {
+		Map<String, Country> countryMap;
+		List<Country> allCountry = countryRepository.findAll();
+		if(!allCountry.isEmpty()) {
+			countryMap = allCountry.stream().collect(Collectors.toMap(Country::getCountryName, i -> i));
+		}else {
+			countryMap = new HashMap<>();
+		}
+		return countryMap;
 	}
 
 
+	/**
+	 * @param paginatedOrder
+	 * @return
+	 */
 	public List<OrderVm> getPaginatedOrders(PaginatedOrder paginatedOrder) {
 		Pageable firstPageWithTwoElements = PageRequest.of(paginatedOrder.getPageIndex(), paginatedOrder.getPageSize());
 		long count = orderRepository.count();
@@ -148,6 +193,10 @@ public class OrderService {
 		return populateOrderVm(orderRepository.findAll(firstPageWithTwoElements).toList());
 	}
 
+	/**
+	 * @param orders
+	 * @return
+	 */
 	private List<OrderVm> populateOrderVm(List<Order> orders) {
 		if(orders != null && !orders.isEmpty()) {
 			return orders.stream().map(Order::getOrderVm).collect(Collectors.toList());

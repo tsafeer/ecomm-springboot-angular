@@ -33,4 +33,14 @@ public final class Partition<T> extends AbstractList<List<T>> {
     public int size() {
         return (int) Math.ceil((double) list.size() / (double) chunkSize);
     }
+    
+    @Override
+    public boolean equals(Object o) {
+    	return super.equals(o);
+    }
+    
+    @Override
+    public int hashCode() {
+    	return super.hashCode();
+    }
 }

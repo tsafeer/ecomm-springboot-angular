@@ -1,5 +1,8 @@
 <div class="mat-elevation-z8">
-    <div class="err-msg">{{message}}</div>
+  <div class="info-msg">Please upload Orders data file in csv format</div>
+    <div class="err-msg">{{message}}
+      <span *ngFor="let msg of errors"><br>{{msg}}</span>
+    </div>
   <mat-progress-bar mode="indeterminate" *ngIf="isProgress"></mat-progress-bar>
     
   <mat-form-field>
@@ -8,7 +11,7 @@
         <!-- Display files names [(ngModel)]="fileAttr" -->
         <input matInput readonly name="name" [(ngModel)]="fileAttr"/>
         <!-- Browse Button -->
-        <button mat-flat-button color="primary" [disabled]="isProgress">Browse File</button>
+        <button mat-flat-button color="primary" [disabled]="isProgress">Upload File</button>
       </mat-toolbar>
       <!-- Fetch selected filed on change -->
       <input
@@ -18,9 +21,14 @@
         (change)="uploadFile($event)"
         name="uploadFile"
         accept="csv/*"
+        [disabled]="isProgress"
       />
      
     </div>
         
   </mat-form-field>
 </div>
+<div style="padding-top:10px;" *ngIf="!isProgress">
+  <a href="/order"><button mat-flat-button color="primary">View Orders</button></a>
+  </div>
+  

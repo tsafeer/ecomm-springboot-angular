@@ -24,3 +24,5 @@ log4j:
   appender: 
     consoleAppender: org.apache.log4j.ConsoleAppender
     consoleAppender.layout: org.apache.log4j.PatternLayout
+    
+logging.level.root: DEBUG

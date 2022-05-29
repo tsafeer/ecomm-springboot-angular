@@ -10,6 +10,7 @@ import { OrderService } from '../order.service';
 })
 export class UploadComponent implements OnInit {
   public isProgress = false;
+  public errors: string[] = [];
   constructor(private orderService: OrderService, private router: Router) {}
 
   ngOnInit(): void {}
@@ -44,6 +45,7 @@ export class UploadComponent implements OnInit {
 
   uploadFile(event: any) {
     console.log('inside upload ');
+    this.errors = [];
     this.message = '';
     this.isProgress = true;
     if (event.target.files && event.target.files[0]) {
@@ -56,8 +58,26 @@ export class UploadComponent implements OnInit {
           if (data.body.status == 0) {
             this.router.navigate(['/order']);
           } else {
+            console.log('errors: ', data.body.errors);
+            if (data.body.errors) {
+              var len = data.body.errors.length;
+              len = len > 10 ? 10 : len;
+              data.body.errors.slice(0, len).forEach((item: any) => {
+                var msg =
+                  'Line No. ' +
+                  (item.lineNo +1) +
+                  ' : ' +
+                  item.field +
+                  ' - ' +
+                  item.messages[0];
+                console.log(msg);
+                this.errors.push(msg);
+              });
+            }
           }
+          this.fileInput.nativeElement.value = '';
           this.message = data.body.message;
+          this.fileAttr = 'Choose File';
           this.isProgress = false;
         },
         (error) => {

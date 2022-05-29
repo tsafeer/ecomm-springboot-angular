@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <logger name="sun" level="WARN"/>
+    <logger name="com" level="WARN"/>
+    <logger name="org" level="WARN"/>
+    <logger name="javax" level="WARN"/>
+   
+    
+    <logger name="com.demo" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+    
+ </configuration>

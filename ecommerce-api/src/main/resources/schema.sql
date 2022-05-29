@@ -6,7 +6,7 @@ drop table if exists orders;
 
 
 create or replace table orders (
-Order_ID number(13,0),
+Order_ID number(13,0) PRIMARY KEY,
 ordered_by varchar2(9),
 Order_Date date,
 Order_Priority varchar2(1),

@@ -1,4 +1,7 @@
+
 <div class="mat-elevation-z8">
+<div class="no-order" *ngIf="length == 0">No orders available!</div>
+<div *ngIf="length > 0">
 <table mat-table [dataSource]="datasource">
   <!-- Position Column -->
   <ng-container matColumnDef="orderID">
@@ -93,4 +96,8 @@
   (page)="pageEvent = getServerData($event)"
 >
 </mat-paginator>
+</div>
+</div>
+<div style="padding-top:10px;">
+<a href="/"><button mat-flat-button color="primary">Upload Another File</button></a>
 </div>
